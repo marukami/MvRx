@@ -36,6 +36,17 @@ class navigationLifecycleAwareLazy<out T>(private val owner: LifecycleOwner, ini
                 }
                 owner.lifecycle.removeObserver(this)
             }
+
+            @OnLifecycleEvent(Lifecycle.Event.ON_START)
+            fun onStart() {
+                try {
+                    if (!isInitialized()) value
+                } catch (_: IllegalStateException) {
+                    // Fragment tried to access ViewModel before NavHostFragment was accessible
+                    // attached to the activity. ViewModel will now wait for onStart.
+                }
+                owner.lifecycle.removeObserver(this)
+            }
         })
     }
 
