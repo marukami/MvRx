@@ -39,12 +39,9 @@ class navigationLifecycleAwareLazy<out T>(private val owner: LifecycleOwner, ini
 
             @OnLifecycleEvent(Lifecycle.Event.ON_START)
             fun onStart() {
-                try {
-                    if (!isInitialized()) value
-                } catch (_: IllegalStateException) {
-                    // Fragment tried to access ViewModel before NavHostFragment was accessible
-                    // attached to the activity. ViewModel will now wait for onStart.
-                }
+                // If we fail here, then it means the back-stack entry was not
+                // found in the backstack of the navController.
+                if (!isInitialized()) value
                 owner.lifecycle.removeObserver(this)
             }
         })
