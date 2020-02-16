@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "com.vanniktech.maven.publish"
 
+group = 'com.github.marukami'
+
 android {
     compileSdkVersion 28
     resourcePrefix 'mvrx_'
