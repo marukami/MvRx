@@ -1,0 +1,2 @@
+install:
+   - ./gradlew clean assemble androidSourcesJar androidJavadocsJar installArchives --no-daemon --no-parallel
