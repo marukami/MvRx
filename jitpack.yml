@@ -1,2 +1,3 @@
 install:
+   - echo "Running: ./gradlew clean assemble androidSourcesJar androidJavadocsJar installArchives --no-daemon --no-parallel"
    - ./gradlew clean assemble androidSourcesJar androidJavadocsJar installArchives --no-daemon --no-parallel
