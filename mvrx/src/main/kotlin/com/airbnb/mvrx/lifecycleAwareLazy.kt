@@ -2,11 +2,9 @@
 
 package com.airbnb.mvrx
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.OnLifecycleEvent
 import androidx.annotation.RestrictTo
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import java.io.Serializable
 
 private object UninitializedValue
@@ -16,7 +14,7 @@ private object UninitializedValue
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 @SuppressWarnings("Detekt.ClassNaming")
-class lifecycleAwareLazy<out T>(private val owner: LifecycleOwner, initializer: () -> T) : Lazy<T>, Serializable {
+class lifecycleAwareLazy<out T>(owner: LifecycleOwner, initializer: () -> T) : Lazy<T>, Serializable, DefaultLifecycleObserver {
     private var initializer: (() -> T)? = initializer
     @Volatile
     @SuppressWarnings("Detekt.VariableNaming")
@@ -25,9 +23,9 @@ class lifecycleAwareLazy<out T>(private val owner: LifecycleOwner, initializer: 
     private val lock = this
 
     init {
-        owner.lifecycle.addObserver(object : LifecycleObserver {
-            @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-            fun onStart() {
+        owner.lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onCreate(owner: LifecycleOwner) {
+                super.onCreate(owner)
                 if (!isInitialized()) value
                 owner.lifecycle.removeObserver(this)
             }
