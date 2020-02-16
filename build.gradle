@@ -24,13 +24,12 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.5.0'
         classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlinVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
 
         // Upload with:
         // ./gradlew clean assemble androidSourcesJar androidJavadocsJar uploadArchives --no-daemon --no-parallel
         // Need to use snapshot version and explicitly include javadoc/sources tasks until
         // https://github.com/vanniktech/gradle-maven-publish-plugin/issues/54 is fixed
-        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.10.0-SNAPSHOT'
+        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.9.0-SNAPSHOT'
     }
 
     configurations.all {
