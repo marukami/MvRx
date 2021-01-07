@@ -1,6 +1,5 @@
 package com.airbnb.mvrx.hellohilt.di
 
-import androidx.fragment.app.FragmentActivity
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.MvRxState
@@ -8,7 +7,13 @@ import com.airbnb.mvrx.ViewModelContext
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.FragmentComponent
 import dagger.hilt.components.SingletonComponent
+import java.util.AbstractMap
+import javax.inject.Inject
+import javax.inject.Qualifier
+import kotlin.reflect.KClass
 
 /**
  * A [MavericksViewModelFactory] which makes it easy to create instances of a ViewModel
@@ -20,6 +25,9 @@ import dagger.hilt.components.SingletonComponent
  * This class accesses the map of [AssistedViewModelFactory]s from [SingletonComponent] via an [EntryPoint]
  * and uses it to retrieve the requested ViewModel's factory class. It then creates an instance of this ViewModel
  * using the retrieved factory and returns it.
+ *
+ * You can always change the [SingletonComponent] to [ActivityComponent] if you want, and you can create multiple [EntryPoint]s if you need to
+ * scope the ViewModel factories.
  *
  * Example:
  *
@@ -33,18 +41,23 @@ import dagger.hilt.components.SingletonComponent
  *   companion object : HiltMavericksViewModelFactory<MyViewModel, MyState>(MyViewModel::class.java)
  *
  * }
+ *
+ * If you need multiple EntryPoints for different scopes then you can override the `viewModelFactoryMap`
+ * and EntryPoints.get(scopeContext, scopeEntryPoint::class).viewModelFactoryContext
+ *
  */
 abstract class HiltMavericksViewModelFactory<VM : MavericksViewModel<S>, S : MvRxState>(
     private val viewModelClass: Class<out MavericksViewModel<S>>
 ) : MavericksViewModelFactory<VM, S> {
 
-    override fun create(viewModelContext: ViewModelContext, state: S): VM? {
-        return createViewModel(viewModelContext.activity, state)
-    }
+    protected open fun viewModelFactoryMap(viewModelContext: ViewModelContext): Map<Class<out MavericksViewModel<*>>, AssistedViewModelFactory<*, *>> =
+        EntryPoints
+            .get(viewModelContext.activity.applicationContext, HiltMavericksEntryPoint::class.java)
+            .viewModelFactoryContext
+            .factories
 
-    private fun <VM : MavericksViewModel<S>, S : MvRxState> createViewModel(fragmentActivity: FragmentActivity, state: S): VM {
-        val viewModelFactoryMap = EntryPoints.get(fragmentActivity.applicationContext, HiltMavericksEntryPoint::class.java)
-            .viewModelFactories
+    override fun create(viewModelContext: ViewModelContext, state: S): VM? {
+        val viewModelFactoryMap = viewModelFactoryMap(viewModelContext)
         val viewModelFactory = viewModelFactoryMap[viewModelClass]
 
         @Suppress("UNCHECKED_CAST")
@@ -57,5 +70,17 @@ abstract class HiltMavericksViewModelFactory<VM : MavericksViewModel<S>, S : MvR
 @EntryPoint
 @InstallIn(SingletonComponent::class)
 interface HiltMavericksEntryPoint {
-    val viewModelFactories: Map<Class<out MavericksViewModel<*>>, AssistedViewModelFactory<*, *>>
+    val viewModelFactoryContext: SingletonViewModelFactoryContext
+}
+
+@EntryPoint
+@InstallIn(ActivityComponent::class)
+interface HiltActivityMavericksEntryPoint {
+    val viewModelFactoryContext: ActivityViewModelFactoryContext
+}
+
+@EntryPoint
+@InstallIn(FragmentComponent::class)
+interface HiltFragmentMavericksEntryPoint {
+    val viewModelFactoryContext: FragmentViewModelFactoryContext
 }

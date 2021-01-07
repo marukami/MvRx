@@ -9,23 +9,24 @@ import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.Uninitialized
 import com.airbnb.mvrx.fragmentViewModel
+import com.airbnb.mvrx.hellohilt.databinding.FragmentHelloBinding
 import com.airbnb.mvrx.withState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_hello.helloButton
-import kotlinx.android.synthetic.main.fragment_hello.messageTextView
 
 @AndroidEntryPoint
 class HelloFragment : Fragment(R.layout.fragment_hello), MvRxView {
 
-    val viewModel: HelloViewModel by fragmentViewModel()
+    private lateinit var binding: FragmentHelloBinding
+    private val viewModel: HelloViewModel by fragmentViewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        helloButton.setOnClickListener { viewModel.sayHello() }
+        binding = FragmentHelloBinding.bind(view)
+        binding.helloButton.setOnClickListener { viewModel.sayHello() }
     }
 
     override fun invalidate() = withState(viewModel) { state ->
-        helloButton.isEnabled = state.message !is Loading
-        messageTextView.text = when (state.message) {
+        binding.helloButton.isEnabled = state.message !is Loading
+        binding.messageTextView.text = when (state.message) {
             is Uninitialized, is Loading -> getString(R.string.hello_fragment_loading_text)
             is Success -> state.message()
             is Fail -> getString(R.string.hello_fragment_failure_text)

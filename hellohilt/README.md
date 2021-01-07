@@ -6,6 +6,7 @@ This module contains a sample app demonstrating how to setup Hilt and AssistedIn
 So, you will need to use the Snapshot release until Dagger 2.x is released with AssistedInject.
 
 // build.gradle
+```groovy
 buildscript {
     repositories {
         google()
@@ -18,12 +19,15 @@ buildscript {
     }
 }
 
+allprojects {
+    repositories {
+        ...
+    }
+}
+```
+
 // module/build.gradle
 ```groovy
-repositories {
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-}
-
 dependencies {
     def hiltVersion = "HEAD-SNAPSHOT"
     kapt "com.google.dagger:hilt-android-compiler:${hiltVersion}"
@@ -35,7 +39,7 @@ dependencies {
 
 * **Injecting state into ViewModels with AssistedInject**
   
-  Since the `initialState` parameter is only available at runtime, Dagger can not provide this dependency for us. We need the [AssistedInject](https://github.com/square/AssistedInject) library for this purpose.
+  Since the `initialState` parameter is only available at runtime, we need to use the AssistedInject. As of time of writing (2021/01/07) this only available via Daggers snapshot release.
 
 * **Multibinding setup for AssistedInject Factories**
 
@@ -65,7 +69,9 @@ class MyViewModel @AssistedInject constructor(
 ```kotlin
 interface AppModule {
 
-    @[Binds IntoMap ViewModelKey(MyViewModel::class)]
+    @Binds
+    @IntoMap
+    @ViewModelKey(MyViewModel::class)
     fun myViewModelFactory(factory: MyViewModel.Factory): AssistedViewModelFactory<*, *>
 
 }
@@ -87,5 +93,7 @@ class MyFragment : BaseMvRxFragment() {
 
 ## How it works
 
-`HiltMavericksViewModelFactory` will try loading the custom entry point from the `SingletonComponent`
-and lookup the viewModel factory using the `viewModelClass` key.
+In the example here `HiltMavericksViewModelFactory`  will try loading the custom entry point from the `SingletonComponent`
+and lookup the viewModel factory using the `viewModelClass` key. If you want a different scope like `ActivityComponent` then just swap
+`SingletonComponent` for `ActivityComponent`.
+

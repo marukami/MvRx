@@ -1,8 +1,8 @@
 apply plugin: "com.android.application"
 apply plugin: "kotlin-android"
-apply plugin: "kotlin-android-extensions"
-apply plugin: 'dagger.hilt.android.plugin'
+apply plugin: "kotlin-parcelize"
 apply plugin: "kotlin-kapt"
+apply plugin: 'dagger.hilt.android.plugin'
 
 repositories {
     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
@@ -16,6 +16,8 @@ android {
         versionName "0.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    buildFeatures.viewBinding = true
 
     buildTypes {
         release {

@@ -33,7 +33,9 @@ import com.airbnb.mvrx.MvRxState
  * @AssistedModule(includes = [AssistedInject_MyAppModule::class])
  * @Module
  * interface MyAppModule {
- *   @[Binds IntoMap ViewModelKey(MyViewModel::class)]
+ *   @Binds
+ *   @IntoMap
+ *   @ViewModelKey(MyViewModel::class)
  *   fun myViewModelFactory(factory: MyViewModel.Factory): AssistedViewModelFactory<*, *>
  * }
  *
@@ -49,7 +51,7 @@ import com.airbnb.mvrx.MvRxState
  *  val viewModelFactories: Map<Class<out MavericksViewModel<*>>, AssistedViewModelFactory<*, *>>
  * }
  *
- * **NOTE**: If you want multiple `EntryPoint`s for different scopes then your @[Binds ViewModelKey(clazz:class)] will need also have a @Qualifier.
+ * **NOTE**: If you want multiple `EntryPoint`s for different scopes then your @Binds @ViewModelKey(clazz:class) will need also have a @Qualifier.
  *
  * class SomeClass @Inject constructor(
  *   val viewModelFactories: Map<Class<out MavericksViewModel<*>>, AssistedViewModelFactory<*, *>>
